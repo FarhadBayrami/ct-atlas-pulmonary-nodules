@@ -1,0 +1,26 @@
+# Medical imaging data — never commit these
+*.nii.gz
+*.nii
+*.dcm
+*.mha
+*.mhd
+*.raw
+
+# ANTs outputs
+*.mat
+*Warp.nii.gz
+*InverseWarp.nii.gz
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# Data and outputs — store externally
+data/
+outputs/
+logs/
+
+# macOS
+.DS_Store

@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "A Computed Tomography Atlas of Pulmonary Nodules for Lung Cancer Screening"
+message: "If you use this code, please cite the thesis below."
+authors:
+  - family-names: Bayrami
+    given-names: Farhad
+    email: farhad.bayrami@studio.unibo.it
+institution:
+  name: University of Bologna
+  department: Department of Computer Science and Engineering
+date-released: 2025

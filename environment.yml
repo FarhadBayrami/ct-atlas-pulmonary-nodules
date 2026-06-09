@@ -1,0 +1,22 @@
+name: ct-atlas
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pytorch=2.0.0
+  - cudatoolkit=11.8
+  - pip
+  - pip:
+    - SimpleITK
+    - antspyx
+    - numpy
+    - pandas
+    - scipy
+    - matplotlib
+    - seaborn
+    - scikit-image
+    - opencv-python-headless
+    - nibabel
+    - jupyter

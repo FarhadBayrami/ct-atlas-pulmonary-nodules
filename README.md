@@ -186,15 +186,16 @@ jupyter notebook notebooks/01_segmentation_phase1.ipynb
 ## 📚 Citation
 
 If you use this code or thesis in your work, please cite:
-@mastersthesis{bayrami2025ctatlas,
-author    = {Farhad Bayrami},
-title     = {A Computed Tomography Atlas of Pulmonary Nodules for Lung Cancer Screening},
-school    = {University of Bologna},
-year      = {2025},
-type      = {Master's Thesis},
-note      = {Supervisor: Prof. Stefano Diciotti,
-Co-Supervisor: Dr. Giulia Raffaella De Luca}
-}
+
+| Field | Value |
+|-------|-------|
+| **Author** | Farhad Bayrami |
+| **Title** | A Computed Tomography Atlas of Pulmonary Nodules for Lung Cancer Screening |
+| **Type** | Master's Thesis |
+| **School** | University of Bologna |
+| **Year** | 2025 |
+| **Supervisor** | Prof. Stefano Diciotti |
+| **Co-Supervisor** | Dr. Giulia Raffaella De Luca |
 ---
 
 ## 🙏 Acknowledgements

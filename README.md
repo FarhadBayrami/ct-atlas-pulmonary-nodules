@@ -15,7 +15,7 @@ Alma Mater Studiorum – Università di Bologna · Academic Year 2024/2025
 | **Supervisor** | Prof. Stefano Diciotti |
 | **Co-Supervisor** | Dr. Giulia Raffaella De Luca |
 
-> **Note on code availability.** The implementation (segmentation, registration and atlas-construction scripts and notebooks) is kept in a private repository because it works with NLST data obtained under a data-use agreement (CDAS Project NLST-1175). Access to the code or the full thesis text is available on request. See [Contact](#contact).
+> **Note on code availability.** The implementation (segmentation, registration and atlas-construction scripts and notebooks) is kept in a private repository. Access to the code or the full thesis text is available on request. See [Contact](#contact).
 
 ![Nodule frequency map overlaid on the lung template](figures/frequency_overlay_template.png)
 

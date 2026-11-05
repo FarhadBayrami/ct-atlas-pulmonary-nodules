@@ -116,7 +116,7 @@ With all masks in the same template space, they are **summed voxel by voxel** in
 | Access | De-identified data under approved request, CDAS Project NLST-1175 |
 | Subset | NLST series with nodule bounding-box annotations released by the Sybil authors (Mikhael et al., 2023) |
 | Cohort used | 509 baseline (T0) LDCT series, one annotation per series used as the segmentation prompt |
-| Template | Normative lung template built from 30 NLST scans with `antsMultivariateTemplateConstruction2.sh` |
+| Template | Normative lung template built from 30 NLST scans |
 
 No imaging data are distributed in this repository.
 

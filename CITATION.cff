@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you refer to this work, please cite the thesis below."
+type: software
+title: "A Computed Tomography Atlas of Pulmonary Nodules for Lung Cancer Screening"
+authors:
+  - family-names: Bayrami
+    given-names: Farhad
+    email: farhad.bayrami@studio.unibo.it
+    affiliation: "Alma Mater Studiorum - Università di Bologna"
+repository: "https://github.com/FarhadBayrami/ct-atlas-pulmonary-nodules"
+keywords:
+  - lung cancer screening
+  - pulmonary nodules
+  - LDCT
+  - NLST
+  - atlas
+  - image registration
+  - ANTs
+  - LesionLocator
+preferred-citation:
+  type: thesis
+  title: "A Computed Tomography Atlas of Pulmonary Nodules for Lung Cancer Screening"
+  authors:
+    - family-names: Bayrami
+      given-names: Farhad
+  institution:
+    name: "Alma Mater Studiorum - Università di Bologna"
+  year: 2025
+  thesis-type: "Master's Thesis"

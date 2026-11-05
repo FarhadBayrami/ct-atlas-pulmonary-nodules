@@ -24,6 +24,7 @@ Alma Mater Studiorum – Università di Bologna · Academic Year 2024/2025
 ## Table of Contents
 
 - [Abstract](#abstract)
+- [Architecture](#architecture)
 - [Pipeline](#pipeline)
 - [Data](#data)
 - [Results](#results)
@@ -44,26 +45,66 @@ This work establishes a reproducible computational workflow that generates objec
 
 ---
 
+## Architecture
+
+```mermaid
+flowchart TD
+    A["Baseline NLST LDCT scans (Sybil subset, NIfTI)"] --> B["Preprocessing: BIDS/NIfTI, voxel spacing & orientation (RAS)"]
+
+    subgraph P1["Phase 1 - Zero-Shot Nodule Segmentation"]
+        X["Sybil box annotations -> point prompts"] --> C["LesionLocator (MIC-DKFZ, zero-shot 3D)"]
+        C --> D["Per-patient binary nodule masks"]
+    end
+
+    subgraph P2["Phase 2 - Spatial Normalization"]
+        L["Lung masking (JoHof U-Net)"] --> F["ANTs registration: rigid -> affine -> SyN"]
+        E["Normative lung template (30 NLST scans, BHI_template)"] --> F
+        F --> G["Per-patient transforms (native -> template)"]
+        G --> H["Warp nodule masks into template space (nearest-neighbor)"]
+    end
+
+    subgraph P3["Phase 3 - Atlas Construction & Analysis"]
+        I["Voxel-wise mask aggregation"] --> J["Normalize by cohort, threshold, smooth"]
+        J --> K["Probabilistic nodule-frequency atlas + distribution maps"]
+    end
+
+    B --> L
+    B --> C
+    D --> H
+    H --> I
+
+    style P1 fill:#eef6ff,stroke:#4a90d9,color:#000
+    style P2 fill:#f0fff0,stroke:#5cb85c,color:#000
+    style P3 fill:#fff7e6,stroke:#f0ad4e,color:#000
+```
+
+*The three phases are modular, so segmentation, registration, and aggregation can each be run and checked on their own, and large batches are parallelized across scans (GNU Parallel).*
+
+---
+
 ## Pipeline
 
-The workflow has three sequential phases. Each phase consumes the outputs of the previous one.
+### Phase 1 — Zero-Shot Nodule Segmentation
 
-| Phase | Goal | Method | Output |
-|---|---|---|---|
-| **0 · Pre-processing** | Make every scan geometrically consistent | NLST scans in BIDS / NIfTI; voxel spacing and affine preserved; orientation harmonised (LPS → RAS) with SimpleITK | Standardised NIfTI CT volumes |
-| **1 · Nodule segmentation** | Delineate each nodule in 3D without retraining | [LesionLocator](https://github.com/MIC-DKFZ/LesionLocator) (MIC-DKFZ), zero-shot, point-prompted. Prompts generated automatically from the centre of the [Sybil](https://github.com/reginabarzilaygroup/Sybil) bounding-box annotations, converted to RAS and written as JSON | 3D binary nodule mask per scan + QC overlays (axial / sagittal / coronal) |
-| **2 · Registration to template** | Map every subject into one anatomical space | Lungs isolated with a U-Net lung mask ([lungmask](https://github.com/JoHof/lungmask)); [ANTs](https://github.com/ANTsX/ANTs) v2.5.4 multi-stage registration to a normative lung template built from 30 NLST scans | Warped CT volumes and warped nodule masks in template space |
-| **3 · Atlas construction** | Population-level spatial analysis | Voxel-wise summation of warped masks, normalisation by cohort size, Gaussian smoothing (σ = 1), thresholding of non-zero clusters | Absolute and normalised frequency maps, non-zero region mask, location-distribution map |
+Scans are preprocessed into a consistent NIfTI form (BIDS layout, voxel spacing preserved, orientation standardized to RAS with SimpleITK to avoid LPS/RAS misalignment), then segmented with **[LesionLocator](https://github.com/MIC-DKFZ/LesionLocator)** — a zero-shot 3-D lesion segmentation model from the MIC group at the German Cancer Research Center (DKFZ), using its public checkpoint. Because no nodule masks are drawn by hand, the model is instead *prompted*: the publicly available bounding-box annotations from the **[Sybil](https://github.com/reginabarzilaygroup/Sybil)** dataset are converted into point prompts (box center → RAS point), and the first annotation per series is used as the prompt.
 
-### Registration details (Phase 2)
+Batch segmentation is driven by a shell script with multi-scale inference and NIfTI output for downstream ANTs compatibility, distributed across GPU cores with GNU Parallel. For each scan the model produces a probability mask, a binarized nodule mask, and axial/sagittal/coronal PNG overlays for quality control.
 
-| Stage | Degrees of freedom | Similarity metric | Iterations | Purpose |
-|---|---|---|---|---|
-| Rigid | 6 | Mutual Information | 100 × 50 | Correct gross patient-positioning differences |
-| Affine | 12 | Mutual Information | 100 × 50 × 25 | Correct body size and scanner calibration differences |
-| SyN (diffeomorphic) | Non-linear | Cross-Correlation (radius 4) | 100 × 70 × 50 × 10 | Capture local deformations while preserving topology |
+### Phase 2 — Spatial Normalization (Registration)
 
-Multi-resolution shrink factors 8 × 4 × 2 × 1 were used. The resulting affine and warp transforms were applied with `antsApplyTransforms`: **B-spline** interpolation for CT intensities and **nearest-neighbour** interpolation for binary masks, so that masks stay binary.
+To compare nodule locations between patients, every lung is mapped into the same coordinate system. The reference is a **normative lung template** built by group-wise averaging of **30 representative NLST scans** (`antsMultivariateTemplateConstruction2.sh`). Lungs are first isolated with a U-Net lung mask (based on [`JoHof/lungmask`](https://github.com/JoHof/lungmask)) to focus the registration on relevant anatomy.
+
+Each scan is then registered to the template with **[ANTs](https://github.com/ANTsX/ANTs) (v2.5.4)** in three coarse-to-fine stages:
+
+1. **Rigid** (6 DoF), mutual-information metric — corrects gross position and orientation.
+2. **Affine** (12 DoF), mutual-information metric — handles global scaling and shear.
+3. **SyN** symmetric diffeomorphic registration (gradient step 0.1, cross-correlation metric, shrink factors 8×4×2×1, Gaussian regularization σ = 3) — captures local deformation (e.g. respiratory motion) while preserving topology.
+
+The resulting transforms are applied to each patient's **nodule mask** with `antsApplyTransforms` — B-spline interpolation for the CT images, and **nearest-neighbor** for the binary masks so they stay binary. Registration runs at roughly 20 minutes per scan. Using a diffeomorphic (smooth, invertible) warp matters here: it deforms anatomy without tearing or folding, so nodule locations stay anatomically faithful.
+
+### Phase 3 — Atlas Construction & Analysis
+
+With all masks in the same template space, they are **summed voxel by voxel** into a frequency map, then normalized by the cohort size to a 0–1 relative-density scale. Low-occurrence noise is removed by thresholding (keeping voxels above a small frequency) and light Gaussian smoothing (σ = 1) absorbs residual misalignment. The stage outputs a probabilistic nodule-frequency map, a non-zero region mask (every voxel where at least one nodule landed), and a normalized location-distribution map, all rendered as axial/sagittal/coronal views with Matplotlib and Seaborn.
 
 ---
 

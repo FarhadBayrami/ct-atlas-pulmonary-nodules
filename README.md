@@ -174,7 +174,7 @@ No imaging data are distributed in this repository.
 
 ## Acknowledgements
 
-- Prof. Stefano Diciotti and Dr. Giulia Raffaella De Luca for supervision and the lung template.
+- Prof. Stefano Diciotti and Dr. Giulia Raffaella De Luca for supervision.
 - The [MIC-DKFZ](https://github.com/MIC-DKFZ) team for LesionLocator, and the [ANTsX](https://github.com/ANTsX) team for ANTs.
 - The authors of Sybil for releasing the nodule annotations.
 - The National Cancer Institute for access to NLST data through CDAS.

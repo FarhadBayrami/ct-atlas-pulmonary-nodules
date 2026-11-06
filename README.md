@@ -185,6 +185,6 @@ No imaging data are distributed in this repository.
 
 **Farhad Bayrami**
 Email: farhad.bayrami@studio.unibo.it
-[ORCID](https://orcid.org/0009-0001-5786-3363) · [LinkedIn](https://www.linkedin.com/in/farhad-bayrami-9410a8279/) · [Google Scholar](https://scholar.google.com/citations?user=zFwyidYAAAAJ) · [GitHub](https://github.com/FarhadBayrami)
+ · · [ORCID](https://orcid.org/0009-0001-5786-3363) · [LinkedIn](https://www.linkedin.com/in/farhad-bayrami-9410a8279/) · [Google Scholar](https://scholar.google.com/citations?user=zFwyidYAAAAJ) · [GitHub](https://github.com/FarhadBayrami)
 
 To request access to the code repository or the full thesis, please email with a short note on your intended use.

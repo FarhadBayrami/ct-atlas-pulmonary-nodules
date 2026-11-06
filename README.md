@@ -141,14 +141,7 @@ No imaging data are distributed in this repository.
 
 ---
 
-## Limitations and Future Work
 
-| Limitation | Planned direction |
-|---|---|
-| Relatively small subset of NLST | Scale the pipeline to the full NLST cohort and to external screening datasets |
-| Segmentation quality was not quantitatively validated against expert delineations | Radiologist review and Dice-based evaluation per nodule type (solid, part-solid, GGO) |
-| Registration quality was assessed qualitatively | Landmark error, Jacobian-determinant and overlap metrics |
-| ANTs SyN is computationally expensive (≈ 20 min per scan) | GPU or learning-based registration for large-scale use |
 
 ---
 
